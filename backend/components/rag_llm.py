@@ -31,9 +31,12 @@ class RAGLLM(BaseLLM):
 
             # Retrieve RAG context from vector store
             results = self.vectorstore.search(last_user_msg, top_k=3)
-            context_text = "\n".join([r["text"] for r in results])
-
-            prompt = f"Use the context below to answer the question:\n\n{context_text}\n\nQuestion: {last_user_msg}"
+            if len(results)>0:
+                context_text = "\n".join([r["text"] for r in results])
+                prompt = f"User query is asking this question: {last_user_msg} and here is little context about it: {context_text}"
+            else:
+                prompt = f"User query is asking this question: {last_user_msg}"
+                
 
             augmented_messages = [
                 {"role": msg.role.value, "content": prompt if msg == last_msg else msg.content}
@@ -42,7 +45,7 @@ class RAGLLM(BaseLLM):
 
             if not augmented_messages:
                 augmented_messages = [
-                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": "You are a helpful assistant, answer user's query."},
                     {"role": "user", "content": prompt}
                 ]
 
