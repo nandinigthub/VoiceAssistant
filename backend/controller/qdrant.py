@@ -32,10 +32,10 @@ class VectorStore:
 
         self.client.upsert(collection_name=self.collection, points=points)
 
-    def search(self, query: str, top_k: int = 3,score_threshold:float=0.7):
+    def search(self, query: str, top_k: int = 3,score_threshold:float=0.2):
         print("search")
         emb = self.embeddings.embed_query(query)
-        hits = self.client.search(collection_name=self.collection, query_vector=emb, limit=top_k,score_threshold=score_threshold)
+        hits = self.client.search(collection_name=self.collection, query_vector=emb, limit=top_k)
         results = []
         for h in hits:
             results.append({"id": h.id, "text": h.payload.get("text", ""), "score": float(h.score)})
